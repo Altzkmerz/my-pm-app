@@ -20,12 +20,7 @@ Prisma
 
 ```bash
 npm install -g prisma
-```
 
-## Iniciando o projeto
-
-```bash
-npm run dev
 ```
 
 ## Como atualizar o banco
@@ -33,9 +28,16 @@ npm run dev
 Com o projeto parado:
 
 ```bash
+npx prisma generate --force 
+
 npx prisma db seed
 
-npx prisma generate --force 
+```
+
+## Iniciando o projeto
+
+```bash
+npm run dev
 ```
 
 
