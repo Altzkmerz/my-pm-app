@@ -23,22 +23,28 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  try {
     const { produtoId, quantidade } = await req.json();
-  
+
+    // Validate if both fields are present
+    if (!produtoId || !quantidade) {
+      return NextResponse.json({ error: 'ProdutoId e quantidade são obrigatórios' }, { status: 400 });
+    }
+
     const produto = await prisma.produto.findUnique({
       where: { id: produtoId },
     });
-  
+
     if (!produto) {
       return NextResponse.json({ error: 'Produto não encontrado' }, { status: 404 });
     }
-  
+
     if (quantidade > produto.quantidade) {
       return NextResponse.json({ error: 'Estoque insuficiente' }, { status: 400 });
     }
-  
+
     const total = produto.preco * quantidade;
-  
+
     const pedido = await prisma.pedido.create({
       data: {
         produtoId,
@@ -46,13 +52,17 @@ export async function POST(req: Request) {
         total,
       },
     });
-  
+
     await prisma.produto.update({
       where: { id: produtoId },
       data: {
         quantidade: produto.quantidade - quantidade,
       },
     });
-  
+
     return NextResponse.json(pedido, { status: 201 });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({ error: 'Erro ao criar pedido' }, { status: 500 });
   }
+}
